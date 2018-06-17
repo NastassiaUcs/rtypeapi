@@ -36,9 +36,11 @@ namespace rtypeapi
                 var ip = request.RemoteEndPoint.ToString();
                 string requesText = request.RawUrl;
 
+                string requestBody = GetRequestPostData(request);
+
                 Console.WriteLine("ip = {0}", ip);
 
-                dataBase.SaveRequestAndIP(requesText, ip);
+                dataBase.SaveRequestAndIP(requesText, requestBody, ip);
 
                 var response = context.Response;
 
@@ -58,6 +60,21 @@ namespace rtypeapi
                 response.OutputStream.Close();
 
                 //Console.WriteLine("{0} request was caught: {1}", request.HttpMethod, request.Url);
+            }
+        }
+
+        public static string GetRequestPostData(HttpListenerRequest request)
+        {
+            if (!request.HasEntityBody)
+            {
+                return null;
+            }
+            using (System.IO.Stream body = request.InputStream) // here we have data
+            {
+                using (System.IO.StreamReader reader = new System.IO.StreamReader(body, request.ContentEncoding))
+                {
+                    return reader.ReadToEnd();
+                }
             }
         }
 

@@ -61,18 +61,19 @@ namespace rtypeapi
             return result;
         }
 
-        public bool SaveRequestAndIP(string request, string ip)
+        public bool SaveRequestAndIP(string request, string body, string ip)
         {
             Logger.Info("save request, ip in db");
             Hashtable issues = new Hashtable();
             Hashtable parameters = new Hashtable
             {
                 { "@request_text", request },
-                { "@ip", ip }
+                { "@ip", ip },
+                { "@body", body }
             };
 
-            bool result = UniversalQuery("insert into request (request_text, ip) " +
-                "select @request_text, @ip", parameters, null);
+            bool result = UniversalQuery("insert into request (request_text, body, ip) " +
+                "select @request_text, @body, @ip", parameters, null);
 
             return result;
         }
