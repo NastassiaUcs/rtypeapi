@@ -2,5 +2,6 @@
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     request_text VARCHAR,
     ip           VARCHAR,
-    body         VARCHAR
+    body         VARCHAR,
+    date         VARCHAR
 );

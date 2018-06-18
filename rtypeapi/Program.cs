@@ -13,7 +13,7 @@ namespace rtypeapi
         static void Main(string[] args)
         {
             listener = new Listener();
-            listener.Listen();
+            listener.Listen();            
             Console.ReadKey();
         }
     }
