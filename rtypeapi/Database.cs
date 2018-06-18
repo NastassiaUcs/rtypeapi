@@ -69,12 +69,11 @@ namespace rtypeapi
             {
                 { "@request_text", request },
                 { "@ip", ip },
-                { "@body", body },
-                { "@date", DateTime.Now.ToString() }
+                { "@body", body }
             };
 
             bool result = UniversalQuery("insert into request (request_text, body, ip, date) " +
-                "select @request_text, @body, @ip, @date", parameters, null);
+                "select @request_text, @body, @ip, datetime('now')", parameters, null);
 
             return result;
         }

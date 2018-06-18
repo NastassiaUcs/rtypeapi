@@ -29,41 +29,50 @@ namespace rtypeapi
         {
             while (true)
             {
-                HttpListenerContext context = listener.GetContext();
-                HttpListenerRequest request = context.Request;
-                //ShowRequestData(request);
-
-                var ip = request.RemoteEndPoint.ToString();
-                string requesText = request.RawUrl;                
-                string requestBody = GetRequestPostData(request);
-                
-                if (requesText != "/favicon.ico")
+                try
                 {
-                    Console.WriteLine("ip = {0}", ip);
-                    Console.WriteLine("requesText = {0}", requesText);
-                    Console.WriteLine("requestBody = {0}", requestBody);
+                    HttpListenerContext context = listener.GetContext();
+                    HttpListenerRequest request = context.Request;
+                    //ShowRequestData(request);
 
-                    dataBase.SaveRequestAndIP(requesText, requestBody, ip);
+                    //var ip = request.RemoteEndPoint.ToString();
+                    IEnumerable<string> headerValues = request.Headers.GetValues("X-Real-Ip");
+                    string ip = headerValues.FirstOrDefault();
+                    string requesText = request.RawUrl;
+                    string requestBody = GetRequestPostData(request);
+
+                    if (requesText != "/favicon.ico")
+                    {
+                        Console.WriteLine("ip = {0}", ip);
+                        Console.WriteLine("requesText = {0}", requesText);
+                        Console.WriteLine("requestBody = {0}", requestBody);
+
+                        dataBase.SaveRequestAndIP(requesText, requestBody, ip);
+                    }
+
+                    var response = context.Response;
+
+                    //Console.WriteLine("StatusCode - {0}", HttpStatusCode.OK.ToString());
+                    response.StatusCode = (int)HttpStatusCode.OK;
+                    response.ContentType = "application/json; charset=utf-8";
+
+                    //Console.WriteLine("start select json");
+                    //string json = Answers.GetJson(lastId);
+                    var body = Encoding.UTF8.GetBytes("200");
+                    //Console.WriteLine("end select json");
+
+                    response.OutputStream.Write(body, 0, body.Length);
+                    //Console.WriteLine("flush");
+                    response.OutputStream.Flush();
+                    //Console.WriteLine("close");
+                    response.OutputStream.Close();
+
+                    //Console.WriteLine("{0} request was caught: {1}", request.HttpMethod, request.Url);
                 }
-
-                var response = context.Response;
-
-                //Console.WriteLine("StatusCode - {0}", HttpStatusCode.OK.ToString());
-                response.StatusCode = (int)HttpStatusCode.OK;
-                response.ContentType = "application/json; charset=utf-8";
-
-                //Console.WriteLine("start select json");
-                //string json = Answers.GetJson(lastId);
-                var body = Encoding.UTF8.GetBytes("200");
-                //Console.WriteLine("end select json");
-
-                response.OutputStream.Write(body, 0, body.Length);
-                //Console.WriteLine("flush");
-                response.OutputStream.Flush();
-                //Console.WriteLine("close");
-                response.OutputStream.Close();
-
-                //Console.WriteLine("{0} request was caught: {1}", request.HttpMethod, request.Url);
+                catch (Exception e)
+                {
+                    Logger.Error(e.Message);
+                }
             }
         }
 
