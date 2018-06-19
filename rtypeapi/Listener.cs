@@ -35,14 +35,24 @@ namespace rtypeapi
                     HttpListenerRequest request = context.Request;
                     //ShowRequestData(request);
 
-                    //var ip = request.RemoteEndPoint.ToString();
-                    IEnumerable<string> headerValues = request.Headers.GetValues("X-Real-Ip");
-                    string ip = headerValues.FirstOrDefault();
+                    string ip = "";                    
+                    try
+                    {
+                        IEnumerable<string> headerValues = request.Headers.GetValues("X-Real-Ip");
+                        ip = headerValues.FirstOrDefault();
+                    }
+                    catch
+                    {
+                        ip = request.RemoteEndPoint.ToString();
+                        ip = ip.Split(':')[0];
+                    }
                     string requesText = request.RawUrl;
                     string requestBody = GetRequestPostData(request);
 
                     if (requesText != "/favicon.ico")
                     {
+                        Console.WriteLine("------------------------------------------");
+                        Console.WriteLine("time = {0}", DateTime.Now.ToString());
                         Console.WriteLine("ip = {0}", ip);
                         Console.WriteLine("requesText = {0}", requesText);
                         Console.WriteLine("requestBody = {0}", requestBody);

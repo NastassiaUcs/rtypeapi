@@ -29,7 +29,7 @@ namespace rtypeapi
         public static void CreateConfig()
         {
             string filename = @"./config_rtype.json";
-            Logger.Info("read config");
+            //Logger.Info("read config");
 
             config = new Config();
             using (StreamReader r = new StreamReader(filename))

@@ -13,14 +13,14 @@ namespace rtypeapi
         {
             config = Config.GetConfig();
             connection = new SQLiteConnection(string.Format("Data Source={0};", config.db_name));
-            Logger.Debug("create connection");
+            //Logger.Debug("create connection");
         }
 
         private bool UniversalQuery(string sql, Hashtable parameters, Action<SQLiteDataReader> processor)
         {
             bool result = false;
-            Logger.Info("connect to base");
-            Logger.Info(sql);
+            //Logger.Info("connect to base");
+            //Logger.Info(sql);
             try
             {
                 connection.Open();
@@ -63,7 +63,7 @@ namespace rtypeapi
 
         public bool SaveRequestAndIP(string request, string body, string ip)
         {
-            Logger.Info("save request, ip in db");
+            //Logger.Info("save request, ip in db");
             Hashtable issues = new Hashtable();
             Hashtable parameters = new Hashtable
             {
