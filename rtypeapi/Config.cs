@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace rtypeapi
 {
@@ -14,6 +11,9 @@ namespace rtypeapi
         public string port;// = "5030";
         public string prefix;
         public string db_name;
+        public string bot_token;
+        public string host;
+        public List<long> ids;
 
         public static Config config;
 
@@ -26,7 +26,7 @@ namespace rtypeapi
             return config;
         }
 
-        public static void CreateConfig()
+        private static void CreateConfig()
         {
             string filename = @"./config_rtype.json";
             //Logger.Info("read config");
@@ -37,7 +37,8 @@ namespace rtypeapi
                 string json = r.ReadToEnd();
                 config = JsonConvert.DeserializeObject<Config>(json);
             }
-            config.prefix = String.Format("{0}:{1}/", config.url, config.port);         
+            config.prefix = String.Format("{0}:{1}/", config.url, config.port);
+            config.host += "bot" + config.bot_token + "/";
         }
     }
 }

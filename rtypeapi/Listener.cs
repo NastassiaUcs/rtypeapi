@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-
 namespace rtypeapi
 {
     class Listener
@@ -13,10 +11,12 @@ namespace rtypeapi
         HttpListener listener;
         Config config;
         DataBase dataBase;
+        Web web;
 
         public Listener()
         {
             config = Config.GetConfig();
+            web = new Web();
             dataBase = new DataBase();
             listener = new HttpListener();
             listener.Prefixes.Add(config.prefix);
@@ -33,7 +33,6 @@ namespace rtypeapi
                 {
                     HttpListenerContext context = listener.GetContext();
                     HttpListenerRequest request = context.Request;
-                    //ShowRequestData(request);
 
                     string ip = "";                    
                     try
@@ -52,32 +51,25 @@ namespace rtypeapi
                     if (requesText != "/favicon.ico")
                     {
                         Console.WriteLine("------------------------------------------");
-                        Console.WriteLine("time = {0}", DateTime.Now.ToString());
-                        Console.WriteLine("ip = {0}", ip);
-                        Console.WriteLine("requesText = {0}", requesText);
-                        Console.WriteLine("requestBody = {0}", requestBody);
+                        string msg = String.Format("time = {0}", DateTime.Now.ToString()) + "\n" +
+                            String.Format("ip = {0}", ip) + "\n" +
+                            String.Format("requesText = {0}", requesText) + "\n" +
+                            String.Format("requestBody = {0}", requestBody);
+                        
+                        Console.WriteLine(msg);
 
                         dataBase.SaveRequestAndIP(requesText, requestBody, ip);
+
+                        web.SendMessage(msg);
                     }
 
-                    var response = context.Response;
-
-                    //Console.WriteLine("StatusCode - {0}", HttpStatusCode.OK.ToString());
+                    var response = context.Response;                                       
                     response.StatusCode = (int)HttpStatusCode.OK;
                     response.ContentType = "application/json; charset=utf-8";
-
-                    //Console.WriteLine("start select json");
-                    //string json = Answers.GetJson(lastId);
                     var body = Encoding.UTF8.GetBytes("200");
-                    //Console.WriteLine("end select json");
-
-                    response.OutputStream.Write(body, 0, body.Length);
-                    //Console.WriteLine("flush");
+                    response.OutputStream.Write(body, 0, body.Length);                    
                     response.OutputStream.Flush();
-                    //Console.WriteLine("close");
                     response.OutputStream.Close();
-
-                    //Console.WriteLine("{0} request was caught: {1}", request.HttpMethod, request.Url);
                 }
                 catch (Exception e)
                 {
@@ -98,35 +90,6 @@ namespace rtypeapi
                 {
                     return reader.ReadToEnd();
                 }
-            }
-        }
-
-        public static void ShowRequestData(HttpListenerRequest request)
-        {
-            if (!request.HasEntityBody)
-            {
-                Console.WriteLine("No client data was sent with the request.");
-                return;
-            }
-
-            Stream body = request.InputStream;
-            Encoding encoding = request.ContentEncoding;
-
-            using (StreamReader reader = new StreamReader(body, encoding))
-            {
-                if (request.ContentType != null)
-                {
-                    Console.WriteLine("Client data content type {0}", request.ContentType);
-                }
-
-                Console.WriteLine("Client data content length {0}", request.ContentLength64);
-                Console.WriteLine("Start of client data:");
-
-                string s = reader.ReadToEnd();
-
-                Console.WriteLine(s);
-                Console.WriteLine("End of client data:");
-                body.Close();
             }
         }
     }
