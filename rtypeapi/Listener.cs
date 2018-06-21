@@ -55,8 +55,12 @@ namespace rtypeapi
                         string msg = String.Format("time = {0}", DateTime.Now.ToString()) + "\n" +
                             String.Format("ip = {0}", ip) + "\n" +
                             String.Format("requesText = {0}", requesText) + "\n" +
-                            String.Format("requestBody = {0}", requestBody) + "\n\n";
-                        msg += count == 0 ? "NEW USER" : "count init = " + count.ToString();
+                            String.Format("requestBody = {0}", requestBody);
+                        if (requestBody.Contains("init"))
+                        {
+                            msg += "\n\n";
+                            msg += count == 0 ? "NEW USER" : "count init = " + count.ToString();
+                        }
 
                         Console.WriteLine(msg);
 

@@ -55,6 +55,7 @@ namespace rtypeapi
             {
                 if (message.chat.Type == ChatType.Private && message.text == "/online")
                 {
+                    Logger.Info("received a request for the number of online users");
                     int count = statistics.GetCountOnlineUsers();
 
                     Message msg = new Message
