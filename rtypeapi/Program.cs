@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace rtypeapi
 {
@@ -12,9 +8,21 @@ namespace rtypeapi
 
         static void Main(string[] args)
         {
-            listener = new Listener();
+            DataBase dataBase = new DataBase();            
+            listener = new Listener(dataBase);
+            Bot bot = new Bot(dataBase);
+            bot.StartGettingUpdates();
             listener.Listen();            
-            Console.ReadKey();
+            
+            while (true)
+            {
+                var exit = Console.ReadLine();
+                if (exit == "exit")
+                {
+                    bot.FinishGettingUpdates();
+                    Environment.Exit(0);
+                }
+            }
         }
     }
 }

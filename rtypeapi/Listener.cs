@@ -13,11 +13,11 @@ namespace rtypeapi
         DataBase dataBase;
         Web web;
 
-        public Listener()
+        public Listener(DataBase dataBase)
         {
             config = Config.GetConfig();
             web = new Web();
-            dataBase = new DataBase();
+            this.dataBase = dataBase;
             listener = new HttpListener();
             listener.Prefixes.Add(config.prefix);
             listener.Start();
@@ -50,12 +50,14 @@ namespace rtypeapi
 
                     if (requesText != "/favicon.ico")
                     {
+                        int count = dataBase.GetCountGameForIP(ip);
                         Console.WriteLine("------------------------------------------");
                         string msg = String.Format("time = {0}", DateTime.Now.ToString()) + "\n" +
                             String.Format("ip = {0}", ip) + "\n" +
                             String.Format("requesText = {0}", requesText) + "\n" +
-                            String.Format("requestBody = {0}", requestBody);
-                        
+                            String.Format("requestBody = {0}", requestBody) + "\n\n";
+                        msg += count == 0 ? "NEW USER" : "count init = " + count.ToString();
+
                         Console.WriteLine(msg);
 
                         dataBase.SaveRequestAndIP(requesText, requestBody, ip);
