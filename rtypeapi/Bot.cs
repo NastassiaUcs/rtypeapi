@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace rtypeapi
 {
@@ -45,6 +46,7 @@ namespace rtypeapi
                     offset = result.update_id + 1;
                 }
             }
+            Task.Delay(10000);
         }
 
         private bool ProcessingResult(Result result)

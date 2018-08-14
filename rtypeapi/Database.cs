@@ -99,10 +99,42 @@ namespace rtypeapi
             return result;
         }
 
+        internal string CheckName(string ip)
+        {
+            Hashtable parameters = new Hashtable
+            {
+                { "@ip", ip }
+            };
+
+            string name = "";
+            string cmd = @"SELECT name FROM names where ip = @ip limit 1";
+
+            UniversalQuery(cmd, parameters, (SQLiteDataReader reader) =>
+            {
+                while (reader.Read())
+                {
+                    name = reader.GetString(0);
+                }
+            });
+
+            return name;
+        }
+        
+        internal string SaveNameForIp(string ip, string name)
+        {
+            Hashtable parameters = new Hashtable
+            {
+                { "@ip", ip },
+                { "@name", name }
+            };
+
+            bool result = UniversalQuery("insert into names (ip, name) select @ip, @name", parameters, null);
+
+            return result.ToString();
+        }
+
         public bool SaveRequestAndIP(string request, string body, string ip)
         {
-            //Logger.Info("save request, ip in db");
-            Hashtable issues = new Hashtable();
             Hashtable parameters = new Hashtable
             {
                 { "@request_text", request },

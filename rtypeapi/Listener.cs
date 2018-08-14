@@ -1,23 +1,25 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+
 namespace rtypeapi
 {
     class Listener
     {
         HttpListener listener;
         Config config;
-        DataBase dataBase;
+        DataBase db;
         Web web;
 
-        public Listener(DataBase dataBase)
+        public Listener(DataBase db)
         {
             config = Config.GetConfig();
             web = new Web();
-            this.dataBase = dataBase;
+            this.db = db;
             listener = new HttpListener();
             listener.Prefixes.Add(config.prefix);
             listener.Start();
@@ -50,7 +52,7 @@ namespace rtypeapi
 
                     if (requesText != "/favicon.ico")
                     {
-                        int count = dataBase.GetCountGameForIP(ip);
+                        int count = db.GetCountGameForIP(ip);
                         Console.WriteLine("------------------------------------------");
                         string msg = String.Format("time = {0}", DateTime.Now.ToString()) + "\n" +
                             String.Format("ip = {0}", ip) + "\n" +
@@ -64,15 +66,28 @@ namespace rtypeapi
 
                         Console.WriteLine(msg);
 
-                        dataBase.SaveRequestAndIP(requesText, requestBody, ip);
+                        db.SaveRequestAndIP(requesText, requestBody, ip);
 
                         web.SendMessage(msg);
                     }
 
+                    string result = "true";
+                    
+                    if (requestBody.Contains("init"))
+                    {
+                        result = db.CheckName(ip);
+                    }
+                    else if (requestBody.Contains("name"))
+                    {
+                        Dictionary<string, string> name = JsonConvert.DeserializeObject<Dictionary<string, string>>(requestBody);
+                        result = db.SaveNameForIp(ip, name["name"].Trim());
+                    }
+                    
+                    byte[] body = Encoding.UTF8.GetBytes("{\"result\": \"" + result + "\"}");
+                    
                     var response = context.Response;                                       
                     response.StatusCode = (int)HttpStatusCode.OK;
                     response.ContentType = "application/json; charset=utf-8";
-                    var body = Encoding.UTF8.GetBytes("200");
                     response.OutputStream.Write(body, 0, body.Length);                    
                     response.OutputStream.Flush();
                     response.OutputStream.Close();
